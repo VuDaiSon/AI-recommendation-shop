@@ -28,15 +28,12 @@
         private final UserMapper userMapper;
         private final PasswordEncoder passwordEncoder;
         private final Validator validator;
-//        private final EmailService emailService;
-
 
         public UserServiceImpl(UserRepository userRepository, HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator) {
             this.userRepository = userRepository;
             this.httpSession = httpSession;
             this.userMapper = userMapper;
             this.passwordEncoder = passwordEncoder;
-//            this.emailService = emailService;
             this.validator = validator;
         }
 

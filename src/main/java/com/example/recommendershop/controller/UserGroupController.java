@@ -1,6 +1,7 @@
 package com.example.recommendershop.controller;
 
 import com.example.recommendershop.dto.ResponseData;
+import com.example.recommendershop.dto.userGroup.UserGroupChangeRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupResponse;
 import com.example.recommendershop.service.userGroup.UserGroupService;
@@ -37,5 +38,9 @@ public class UserGroupController {
     @DeleteMapping("/{userGroupId}")
     public ResponseData<?> delete(@PathVariable(name = "userGroupId") UUID userGroupId){
         return userGroupService.delete(userGroupId);
+    }
+    @PatchMapping("/changeUserRole/{userGroupId}")
+    public UserGroupResponse change(@PathVariable(name = "userGroupId") UUID userGroupId, @RequestBody UserGroupChangeRequest edit){
+        return userGroupService.editUserGroup(userGroupId, edit);
     }
 }

@@ -71,6 +71,7 @@ public class CategoryServiceImpl implements CategoryService{
         categoryRepository.deleteById(categoryId);
     }
     protected BasePage<CategoryAvatar> map(Page<Category> page) {
+
         BasePage<CategoryAvatar> rPage = new BasePage<>();
         rPage.setData(categoryMapper.toListDao(page.getContent()));
         rPage.setTotalPage(page.getTotalPages());

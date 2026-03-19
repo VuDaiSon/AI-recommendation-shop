@@ -34,6 +34,7 @@ public class CategoryController {
     public void delete(@PathVariable(name = "categoryId") UUID categoryId){
         categoryService.delete(categoryId);
     }
+    @CrossOrigin
     @GetMapping("/")
     public BasePage<CategoryAvatar> findAll(@ParameterObject ApiListBaseRequest listBaseRequest){
         return categoryService.getAll(listBaseRequest);

@@ -1,6 +1,7 @@
 package com.example.recommendershop.service.userGroup;
 
 import com.example.recommendershop.dto.ResponseData;
+import com.example.recommendershop.dto.userGroup.UserGroupChangeRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupResponse;
 
@@ -13,4 +14,5 @@ public interface UserGroupService {
     public List<UserGroupResponse> findAll();
     public UserGroupResponse getDetail(UUID userGroupId);
     public ResponseData<?> delete(UUID userGroupId);
+    public UserGroupResponse editUserGroup(UUID userGroupId, UserGroupChangeRequest edit);
 }

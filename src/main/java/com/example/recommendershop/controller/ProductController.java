@@ -37,6 +37,7 @@ public class ProductController {
     public ProductResponse getById(@PathVariable(name = "productId") UUID productId){
         return productService.detail(productId);
     }
+    @CrossOrigin
     @GetMapping("/")
     public BasePage<ProductAvatar> findAll(@ParameterObject ApiListBaseRequest listRequest){
         return productService.getAll(listRequest);

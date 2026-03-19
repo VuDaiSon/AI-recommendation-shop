@@ -91,7 +91,7 @@ public class RoleGroupServiceImpl implements RoleGroupService{
         }
 
         roleGroupRepository.delete(roleGroup);
-        return new ResponseData<>(HttpStatus.OK.value(), "đã xóa thành công nhóm quyền");
+        return new ResponseData<>(HttpStatus.OK.value(), "Đã xóa thành công nhóm quyền");
     }
     public RoleGroupResponse findById(UUID roleGroupId){
         if(!roleGroupRepository.existsById(roleGroupId)){

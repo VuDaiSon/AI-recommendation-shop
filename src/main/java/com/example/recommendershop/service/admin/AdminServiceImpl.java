@@ -58,7 +58,6 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public UserViewForAdmin update(UUID userId, UserEditForAdmin edit) {
-        permissionCheck.checkPermission("admin");
         User existingUser = userRepository.findById(userId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng!"));
         adminMapper.update(edit, existingUser);
         Set<UUID> userGroupIds = edit.getUserGroupIds();
