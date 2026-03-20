@@ -69,13 +69,16 @@
             httpSession.invalidate();
         }
         public UserInfor detail(UUID userId){
-            String sessionUserId = (String) httpSession.getAttribute("UserId");
+            UUID sessionUserId = (UUID) httpSession.getAttribute("UserId");
+
             if (sessionUserId == null) {
-                throw new MasterException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để thực hiện chức năng này");
+                throw new MasterException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập");
             }
-            if (!sessionUserId.equals(userId.toString())) {
-                throw new MasterException(HttpStatus.FORBIDDEN, "Không có quyền truy cập thông tin người dùng này");
+
+            if (!sessionUserId.equals(userId)) {
+                throw new MasterException(HttpStatus.FORBIDDEN, "Không có quyền");
             }
+
             return userMapper.toDao(userRepository.getReferenceById(userId));
         }
 
