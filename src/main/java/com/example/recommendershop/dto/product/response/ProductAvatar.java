@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -18,4 +19,5 @@ public class ProductAvatar extends BaseDto {
     private int quantity;
     private String image;
     private Double price;
+    private Date date;
 }
