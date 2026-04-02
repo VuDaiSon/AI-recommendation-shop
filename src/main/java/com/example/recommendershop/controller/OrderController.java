@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/Orders")
+@RequestMapping("/orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -28,7 +28,7 @@ public class OrderController {
     public ResponseData<?> confirm(@RequestBody OrderRequest orderRequest){
         return orderService.confirmOrder(orderRequest);
     }
-    @GetMapping("/{userId}")
+    @GetMapping()
     public BasePage<OrderResponse> findAllOrder(@ParameterObject ApiListBaseRequest apiListBaseRequest){
         return orderService.getAllOrders(apiListBaseRequest);
     }

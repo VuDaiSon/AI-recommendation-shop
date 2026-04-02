@@ -6,5 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface CartDetailMapper {
+
     CartDetailResponse toDao(CartDetail cartDetail);
+
 }

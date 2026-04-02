@@ -82,12 +82,19 @@
             return userMapper.toDao(userRepository.getReferenceById(userId));
         }
 
-        public UserInfor update(UUID userId, UserRequest userRequest){
-            User existingUser = userRepository.findById(userId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
-            userMapper.update(userRequest, existingUser);
+        public UserInfor update(UUID userId, UserRequest userRequest) {
+
+            User existingUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
+            existingUser.setName(userRequest.getName());
+            existingUser.setPhone(userRequest.getPhone());
+            existingUser.setAddress(userRequest.getAddress());
+
             User updatedUser = userRepository.save(existingUser);
-            httpSession.setAttribute("UserId", updatedUser.getUserId().toString());
+
+            httpSession.setAttribute("UserId", updatedUser.getUserId());
             httpSession.setAttribute("UserName", updatedUser.getName());
+
             return userMapper.toDao(updatedUser);
         }
         private boolean verifyOldPassword(UUID userId, String oldPassword) {

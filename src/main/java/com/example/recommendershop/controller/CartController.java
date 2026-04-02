@@ -30,7 +30,7 @@ public class CartController {
     public ResponseData<?> RemoveCartLine(@PathVariable(name = "cartDetailId")UUID cartDetailId){
         return cartService.deleteCartLine(cartDetailId);
     }
-    @GetMapping("/{userId}")
+    @GetMapping
     public CartView cartCheck(){
         return cartService.CartCheck();
     }

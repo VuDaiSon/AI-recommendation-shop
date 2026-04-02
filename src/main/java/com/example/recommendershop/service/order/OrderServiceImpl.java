@@ -101,7 +101,11 @@ public class OrderServiceImpl implements OrderService{
         List<CartDetailResponse> cartDetailResponses = cartDetails.stream().map(cartDetail -> {
             Product product = cartDetail.getProduct();
             ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getImage());
-            return new CartDetailResponse(cartDetail.getQuantity(), productInOrder);
+            return new CartDetailResponse(
+                    cartDetail.getCartDetailId(),
+                    cartDetail.getQuantity(),
+                    productInOrder
+            );
         }).collect(Collectors.toList());
         int shippingFee = CalculateShippingFee(subtotal);
 
@@ -176,7 +180,11 @@ public class OrderServiceImpl implements OrderService{
         List<CartDetailResponse> cartDetailResponses = cartDetails.stream().map(cartDetail -> {
             Product product = cartDetail.getProduct();
             ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getImage());
-            return new CartDetailResponse(cartDetail.getQuantity(), productInOrder);
+            return new CartDetailResponse(
+                    cartDetail.getCartDetailId(),
+                    cartDetail.getQuantity(),
+                    productInOrder
+            );
         }).collect(Collectors.toList());
         int shippingFee = CalculateShippingFee(subtotal);
         return new CheckOutViewModel(userResponse, cartResponse, cartDetailResponses, subtotal, shippingFee);
