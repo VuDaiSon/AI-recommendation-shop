@@ -51,7 +51,7 @@ public class AdminServiceImpl implements AdminService{
         return rPage;
     }
     public BasePage<UserViewForAdmin> getAllUser(ApiListBaseRequest listBaseRequest){
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_MANAGE");
         Page<User> page = userRepository.findAll(FilterDataUtil.buildPageRequest(listBaseRequest));
         return this.map(page);
     }
@@ -74,7 +74,7 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public void deleteUser(UUID userId) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_MANAGE");
         User existingUser = userRepository.findById(userId).orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng!"));
         userRepository.delete(existingUser);
     }

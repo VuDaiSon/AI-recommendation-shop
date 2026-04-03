@@ -5,9 +5,15 @@
     import com.example.recommendershop.dto.user.request.LoginRequest;
     import com.example.recommendershop.dto.user.request.UserRequest;
     import com.example.recommendershop.dto.user.response.UserInfor;
+    import com.example.recommendershop.entity.Role;
+    import com.example.recommendershop.entity.RoleGroup;
     import com.example.recommendershop.entity.User;
+    import com.example.recommendershop.entity.UserGroup;
     import com.example.recommendershop.exception.MasterException;
     import com.example.recommendershop.mapper.UserMapper;
+    import com.example.recommendershop.repository.RoleGroupRepository;
+    import com.example.recommendershop.repository.RoleRepository;
+    import com.example.recommendershop.repository.UserGroupRepository;
     import com.example.recommendershop.repository.UserRepository;
     import com.example.recommendershop.config.PasswordEncoder;
 //    import com.example.recommendershop.service.emailMessage.EmailService;
@@ -17,20 +23,25 @@
     import org.springframework.http.HttpStatus;
     import org.springframework.stereotype.Service;
 
-    import java.util.Optional;
-    import java.util.UUID;
+    import java.util.*;
 
     @Service
     public class UserServiceImpl implements UserService {
         @Autowired
         private final UserRepository userRepository;
+        private final UserGroupRepository userGroupRepository;
+        private final RoleGroupRepository roleGroupRepository;
+        private final RoleRepository roleRepository;
         private final HttpSession httpSession;
         private final UserMapper userMapper;
         private final PasswordEncoder passwordEncoder;
         private final Validator validator;
 
-        public UserServiceImpl(UserRepository userRepository, HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator) {
+        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator) {
             this.userRepository = userRepository;
+            this.userGroupRepository = userGroupRepository;
+            this.roleGroupRepository = roleGroupRepository;
+            this.roleRepository = roleRepository;
             this.httpSession = httpSession;
             this.userMapper = userMapper;
             this.passwordEncoder = passwordEncoder;
@@ -50,19 +61,41 @@
 
         @Override
         public ResponseData<?> login(LoginRequest loginRequest) {
+
             if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
                 throw new MasterException(HttpStatus.BAD_REQUEST, "Email và mật khẩu không được để trống");
             }
-            Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
-            User user = userOptional.get();
-            if (userOptional.isEmpty() || !passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())) {
+
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new MasterException(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu sai"));
+
+            if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
                 throw new MasterException(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu sai");
             }
-            UUID token = user.getUserId();
+
+            // 🔥 LẤY ROLES
+            Set<UserGroup> userGroups = userGroupRepository.findByUsers_UserId(user.getUserId());
+            Set<Role> roles = new HashSet<>();
+
+            for (UserGroup userGroup : userGroups) {
+                Set<RoleGroup> roleGroups = roleGroupRepository.findByUserGroups(userGroup);
+                for (RoleGroup roleGroup : roleGroups) {
+                    roles.addAll(roleRepository.findByRoleGroups(roleGroup));
+                }
+            }
+
+            List<String> roleNames = roles.stream()
+                    .map(Role::getName)
+                    .toList();
+
             httpSession.setAttribute("UserId", user.getUserId());
-            httpSession.setAttribute("UserName", user.getName());
-            httpSession.setAttribute("AuthToken", token);
-            return new ResponseData<>(HttpStatus.OK.value(), "Đăng nhập thành công", token);
+
+            // 🔥 TRẢ VỀ DTO
+            Map<String, Object> result = new HashMap<>();
+            result.put("userId", user.getUserId());
+            result.put("roles", roleNames);
+
+            return new ResponseData<>(HttpStatus.OK.value(), "Đăng nhập thành công", result);
         }
         @Override
         public void logout() {

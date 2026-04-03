@@ -38,7 +38,7 @@ public class RoleGroupServiceImpl implements RoleGroupService{
 
     @Override
     public RoleGroupResponse create(RoleGroupRequest roleGroupRequest) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ROLE_GROUP_MANAGE");
         if(roleGroupRepository.findByName(roleGroupRequest.getName())!=null){
             throw new MasterException(HttpStatus.BAD_REQUEST, "Nhóm quyền đã tồn tại");
         }
@@ -56,7 +56,7 @@ public class RoleGroupServiceImpl implements RoleGroupService{
 
     @Override
     public RoleGroupResponse update(UUID roleGroupId, RoleGroupRequest roleGroupRequest) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ROLE_GROUP_MANAGE");
         Optional<RoleGroup> roleGroupOptional = Optional.ofNullable(roleGroupRepository.findById(roleGroupId).orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại!")));
         RoleGroup roleGroup = roleGroupOptional.get();
         Set<Long> roleIds = roleGroupRequest.getRoleId();
@@ -78,7 +78,7 @@ public class RoleGroupServiceImpl implements RoleGroupService{
 
     @Override
     public ResponseData<?> delete(UUID roleGroupId) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ROLE_GROUP_MANAGE");
         RoleGroup roleGroup = roleGroupRepository.findById(roleGroupId)
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Role group not found"));
         for (UserGroup userGroup : roleGroup.getUserGroups()) {

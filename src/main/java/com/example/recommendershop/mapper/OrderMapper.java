@@ -1,11 +1,9 @@
 package com.example.recommendershop.mapper;
 
 import com.example.recommendershop.dto.order.request.OrderRequest;
-import com.example.recommendershop.dto.cart.response.CartResponse;
 import com.example.recommendershop.dto.order.response.OrderResponse;
 import com.example.recommendershop.dto.order.response.ProductInOrder;
 import com.example.recommendershop.dto.user.response.UserResponse;
-import com.example.recommendershop.entity.Cart;
 import com.example.recommendershop.entity.Order;
 import com.example.recommendershop.entity.Product;
 import com.example.recommendershop.entity.User;

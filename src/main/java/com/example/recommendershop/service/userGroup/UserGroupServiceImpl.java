@@ -38,7 +38,7 @@ public class UserGroupServiceImpl implements UserGroupService{
 
     @Override
     public UserGroupResponse add(UserGroupRequest userGroupRequest) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_GROUP_MANAGE");
         if(userGroupRepository.findByName(userGroupRequest.getName())!=null){
             throw new MasterException(HttpStatus.BAD_REQUEST, "Nhóm người dùng đã tồn tại!");
         }
@@ -55,7 +55,7 @@ public class UserGroupServiceImpl implements UserGroupService{
     }
     @Override
     public UserGroupResponse update(UUID userGroupId, UserGroupRequest userGroupRequest) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_GROUP_MANAGE");
         Optional<UserGroup> userGroupOptional = Optional.ofNullable(userGroupRepository.findById(userGroupId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm người dùng!")));
         UserGroup userGroup = userGroupOptional.get();
         Set<UUID> roleGroupIds = userGroupRequest.getRoleGroupIds();
@@ -82,7 +82,7 @@ public class UserGroupServiceImpl implements UserGroupService{
 
     @Override
     public ResponseData<?> delete(UUID userGroupId) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_GROUP_MANAGE");
 
         UserGroup userGroup = userGroupRepository.findById(userGroupId)
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "User group not found"));
@@ -105,7 +105,7 @@ public class UserGroupServiceImpl implements UserGroupService{
 
     @Override
     public UserGroupResponse editUserGroup(UUID userGroupId, UserGroupChangeRequest edit) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("USER_GROUP_MANAGE");
         UserGroup userGroup = userGroupRepository.findById(userGroupId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại"));
         userGroupMapper.update(edit, userGroup);
         return userGroupMapper.toDao(userGroup);

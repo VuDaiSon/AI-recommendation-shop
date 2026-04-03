@@ -210,13 +210,13 @@ public class OrderServiceImpl implements OrderService{
     }
 
     public BasePage<OrderResponse> AdminIndex(ApiListBaseRequest listBaseRequest){
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ORDER_MANAGE");
         Page<Order> page = orderRepository.findAll(FilterDataUtil.buildPageRequest(listBaseRequest));
         return this.map(page);
     }
 
     public AdminEditResponse AdminCheck(UUID orderId){
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ORDER_MANAGE");
         Optional<Order> orderOptional = orderRepository.findById(orderId);
         Order order = orderOptional.get();
         if(order == null){
