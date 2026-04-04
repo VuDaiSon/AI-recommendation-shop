@@ -1,7 +1,6 @@
 package com.example.recommendershop.dto.roleGroup;
 
 import com.example.recommendershop.dto.role.RoleResponse;
-import com.example.recommendershop.dto.userGroup.UserGroupResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

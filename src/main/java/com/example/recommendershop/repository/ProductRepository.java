@@ -1,6 +1,5 @@
 package com.example.recommendershop.repository;
 
-import com.example.recommendershop.entity.CartDetail;
 import com.example.recommendershop.entity.Category;
 import com.example.recommendershop.entity.Product;
 import org.springframework.data.domain.Page;

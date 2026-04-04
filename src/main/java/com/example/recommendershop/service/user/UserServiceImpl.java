@@ -19,7 +19,6 @@
 //    import com.example.recommendershop.service.emailMessage.EmailService;
     import com.example.recommendershop.validation.Validator;
     import jakarta.servlet.http.HttpSession;
-    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.HttpStatus;
     import org.springframework.stereotype.Service;
 
@@ -27,7 +26,6 @@
 
     @Service
     public class UserServiceImpl implements UserService {
-        @Autowired
         private final UserRepository userRepository;
         private final UserGroupRepository userGroupRepository;
         private final RoleGroupRepository roleGroupRepository;

@@ -1,6 +1,5 @@
 package com.example.recommendershop.dto.user.response;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

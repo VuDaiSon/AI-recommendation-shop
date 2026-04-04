@@ -3,11 +3,9 @@ package com.example.recommendershop.service.product;
 import com.example.recommendershop.dto.ApiListBaseRequest;
 import com.example.recommendershop.dto.BasePage;
 import com.example.recommendershop.dto.SearchEntity;
-import com.example.recommendershop.dto.order.response.OrderResponse;
 import com.example.recommendershop.dto.product.request.ProductRequest;
 import com.example.recommendershop.dto.product.response.ProductAvatar;
 import com.example.recommendershop.dto.product.response.ProductResponse;
-import jakarta.servlet.http.HttpServletRequest;
 
 
 import java.util.UUID;

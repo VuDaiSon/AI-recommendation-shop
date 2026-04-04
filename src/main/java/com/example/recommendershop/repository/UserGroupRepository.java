@@ -1,6 +1,5 @@
 package com.example.recommendershop.repository;
 
-import com.example.recommendershop.entity.User;
 import com.example.recommendershop.entity.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

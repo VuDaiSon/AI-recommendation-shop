@@ -18,17 +18,20 @@ import java.util.UUID;
 
 @Service
 public class PermissionCheck {
+    private final HttpSession httpSession;
+    private final UserGroupRepository userGroupRepository;
+    private final RoleGroupRepository roleGroupRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private HttpSession httpSession;
-    private UserGroupRepository userGroupRepository;
-    private RoleGroupRepository roleGroupRepository;
-    private RoleRepository roleRepository;
-    public PermissionCheck(UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository){
+    public PermissionCheck(HttpSession httpSession,
+                           UserGroupRepository userGroupRepository,
+                           RoleGroupRepository roleGroupRepository,
+                           RoleRepository roleRepository){
+        this.httpSession = httpSession;
         this.userGroupRepository = userGroupRepository;
         this.roleGroupRepository = roleGroupRepository;
         this.roleRepository = roleRepository;
-
     }
     public void checkPermission(String permission) {
         UUID userId = (UUID) httpSession.getAttribute("UserId");

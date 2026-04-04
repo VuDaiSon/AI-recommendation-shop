@@ -1,5 +1,7 @@
 package com.example.recommendershop.service.product;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import com.example.recommendershop.authorization.PermissionCheck;
 import com.example.recommendershop.dto.ApiListBaseRequest;
 import com.example.recommendershop.dto.BasePage;
@@ -50,8 +52,7 @@ public class ProductServiceImpl implements ProductService{
         Product product = productMapper.toEntity(productRequest);
         product.setCategory(category);
         product = productRepository.save(product);
-        ProductResponse productResponse = productMapper.toDao(product);
-        return productResponse;
+        return productMapper.toDao(product);
     }
     @Override
     @Transactional
@@ -62,15 +63,32 @@ public class ProductServiceImpl implements ProductService{
         productMapper.update(productRequest, existingProduct);
         existingProduct.setCategory(category);
         Product updatedProduct = productRepository.save(existingProduct);
-        ProductResponse productResponse = productMapper.toDao(updatedProduct);
-        return productResponse;
+         return productMapper.toDao(updatedProduct);
     }
     @Override
-    public void delete(UUID productId){
+    public void delete(UUID productId) {
         permissionCheck.checkPermission("delete");
-        if(!productRepository.existsById(productId)){
-            throw new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm");
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm"));
+
+        // 🔥 XÓA FILE ẢNH TRONG Ổ CỨNG
+        try {
+            String imageUrl = product.getImage();
+
+            if (imageUrl != null && imageUrl.contains("/uploads/")) {
+                String fileName = imageUrl.substring(imageUrl.lastIndexOf("/uploads/") + 9);
+
+                Path filePath = Paths.get("uploads", fileName);
+
+                Files.deleteIfExists(filePath);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Không xóa được file ảnh: " + e.getMessage());
         }
+
+        // 🔥 XÓA DB
         productRepository.deleteById(productId);
     }
     public ProductResponse detail(UUID productId){

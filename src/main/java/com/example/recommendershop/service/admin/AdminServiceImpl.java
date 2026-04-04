@@ -26,14 +26,13 @@ import java.util.UUID;
 @Service
 public class AdminServiceImpl implements AdminService{
 
-    @Autowired
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AdminMapper adminMapper;
     private final PasswordEncoder passwordEncoder;
     private final PermissionCheck permissionCheck;
     private final UserGroupRepository userGroupRepository;
-
+    @Autowired
     public AdminServiceImpl(UserRepository userRepository, UserMapper userMapper, AdminMapper adminMapper, PasswordEncoder passwordEncoder, PermissionCheck permissionCheck, UserGroupRepository userGroupRepository){
         this.userRepository = userRepository;
         this.userMapper = userMapper;

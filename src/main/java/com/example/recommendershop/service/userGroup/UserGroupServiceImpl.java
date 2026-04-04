@@ -56,13 +56,15 @@ public class UserGroupServiceImpl implements UserGroupService{
     @Override
     public UserGroupResponse update(UUID userGroupId, UserGroupRequest userGroupRequest) {
         permissionCheck.checkPermission("USER_GROUP_MANAGE");
-        Optional<UserGroup> userGroupOptional = Optional.ofNullable(userGroupRepository.findById(userGroupId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm người dùng!")));
-        UserGroup userGroup = userGroupOptional.get();
+        UserGroup userGroup = userGroupRepository.findById(userGroupId)
+                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm người dùng!"));
+
         Set<UUID> roleGroupIds = userGroupRequest.getRoleGroupIds();
         userGroup.setName(userGroupRequest.getName());
         Set<RoleGroup> roleGroups = new HashSet<>();
-        for(UUID roleGroupId : roleGroupIds){
-            RoleGroup roleGroup = roleGroupRepository.findById(roleGroupId).orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại!"));
+        for (UUID roleGroupId : roleGroupIds) {
+            RoleGroup roleGroup = roleGroupRepository.findById(roleGroupId)
+                    .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại!"));
             roleGroups.add(roleGroup);
         }
         userGroup.setRoleGroups(roleGroups);

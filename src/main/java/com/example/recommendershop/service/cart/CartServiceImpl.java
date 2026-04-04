@@ -21,7 +21,6 @@ import java.util.*;
 
 @Service
 public class CartServiceImpl implements CartService{
-    @Autowired
     private final CartRepository cartRepository;
     private final CartDetailRepository cartDetailRepository;
     private final HttpSession httpSession;
@@ -29,7 +28,7 @@ public class CartServiceImpl implements CartService{
     private final UserRepository userRepository;
     private final CartMapper cartMapper;
 
-
+    @Autowired
     public CartServiceImpl(CartRepository cartRepository, CartDetailRepository cartDetailRepository, HttpSession httpSession, ProductRepository productRepository, UserRepository userRepository, CartMapper cartMapper){
         this.cartRepository = cartRepository;
         this.cartDetailRepository = cartDetailRepository;
@@ -83,7 +82,7 @@ public class CartServiceImpl implements CartService{
 
         // Find the CartDetail by id
         Optional<CartDetail> optionalCartDetail = cartDetailRepository.findById(cartDetailId);
-        if (!optionalCartDetail.isPresent()) {
+        if (optionalCartDetail.isEmpty()) {
             // If not found, return 404 Not Found
             throw new MasterException(HttpStatus.NOT_FOUND, "CartDetail not found!");
         }
@@ -104,10 +103,10 @@ public class CartServiceImpl implements CartService{
         return new ResponseData<>(HttpStatus.OK.value(),"update thành công");
     }
     public ResponseData<?> deleteCartLine(UUID cartDetailId){
-        if(cartDetailRepository.findById(cartDetailId)==null){
-            throw new MasterException(HttpStatus.NOT_FOUND, "không tìm thấy!");
-        }
-        cartDetailRepository.deleteById(cartDetailId);
+        CartDetail cartDetail = cartDetailRepository.findById(cartDetailId)
+                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "không tìm thấy!"));
+
+        cartDetailRepository.delete(cartDetail);
         return new ResponseData<>(HttpStatus.OK.value(),"xóa thành công");
     }
 

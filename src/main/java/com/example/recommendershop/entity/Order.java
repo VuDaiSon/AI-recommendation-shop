@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity

@@ -12,7 +12,6 @@ import com.example.recommendershop.mapper.RoleGroupMapper;
 import com.example.recommendershop.repository.RoleGroupRepository;
 import com.example.recommendershop.repository.RoleRepository;
 import com.example.recommendershop.repository.UserGroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,6 @@ public class RoleGroupServiceImpl implements RoleGroupService{
     private final UserGroupRepository userGroupRepository;
     private final PermissionCheck permissionCheck;
 
-    @Autowired
     public RoleGroupServiceImpl(RoleGroupRepository roleGroupRepository, RoleRepository roleRepository, RoleGroupMapper roleGroupMapper,
                                 UserGroupRepository userGroupRepository, PermissionCheck permissionCheck){
         this.roleGroupRepository = roleGroupRepository;
@@ -57,8 +55,8 @@ public class RoleGroupServiceImpl implements RoleGroupService{
     @Override
     public RoleGroupResponse update(UUID roleGroupId, RoleGroupRequest roleGroupRequest) {
         permissionCheck.checkPermission("ROLE_GROUP_MANAGE");
-        Optional<RoleGroup> roleGroupOptional = Optional.ofNullable(roleGroupRepository.findById(roleGroupId).orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại!")));
-        RoleGroup roleGroup = roleGroupOptional.get();
+        RoleGroup roleGroup = roleGroupRepository.findById(roleGroupId)
+                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại!"));
         Set<Long> roleIds = roleGroupRequest.getRoleId();
         roleGroup.setName(roleGroupRequest.getName());
         Set<Role> roles = new HashSet<>();
