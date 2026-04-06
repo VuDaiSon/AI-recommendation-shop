@@ -1,7 +1,4 @@
 package com.example.recommendershop.service.product;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import com.example.recommendershop.authorization.PermissionCheck;
 import com.example.recommendershop.dto.ApiListBaseRequest;
 import com.example.recommendershop.dto.BasePage;
@@ -13,6 +10,7 @@ import com.example.recommendershop.entity.*;
 import com.example.recommendershop.exception.MasterException;
 import com.example.recommendershop.mapper.ProductMapper;
 import com.example.recommendershop.repository.*;
+import com.example.recommendershop.service.file.FileService;
 import com.example.recommendershop.utils.FilterDataUtil;
 import com.example.recommendershop.validation.Validator;
 import io.micrometer.common.util.StringUtils;
@@ -34,13 +32,15 @@ public class ProductServiceImpl implements ProductService{
     private final CategoryRepository categoryRepository;
     private final PermissionCheck permissionCheck;
     private final Validator validator;
+    private final FileService fileService;
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, PermissionCheck permissionCheck, Validator validator){
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, PermissionCheck permissionCheck, Validator validator, FileService fileService){
         this.productRepository =productRepository;
         this.productMapper = productMapper;
         this.categoryRepository = categoryRepository;
         this.permissionCheck = permissionCheck;
         this.validator = validator;
+        this.fileService = fileService;
     }
     @Override
     @Transactional
@@ -58,11 +58,15 @@ public class ProductServiceImpl implements ProductService{
     @Transactional
     public ProductResponse update(UUID productId, ProductRequest productRequest) {
         permissionCheck.checkPermission("update");
-        Product existingProduct = validator.checkEntityNotExists(productRepository.findById(productId), HttpStatus.NOT_FOUND, "Sảm phẩm không tồn tại");
+        Product product = validator.checkEntityNotExists(productRepository.findById(productId), HttpStatus.NOT_FOUND, "Sảm phẩm không tồn tại");
         Category category = validator.checkEntityNotExists(categoryRepository.findById(productRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
-        productMapper.update(productRequest, existingProduct);
-        existingProduct.setCategory(category);
-        Product updatedProduct = productRepository.save(existingProduct);
+        String oldImage = product.getImage();
+        productMapper.update(productRequest, product);
+        product.setCategory(category);
+        Product updatedProduct = productRepository.save(product);
+        if (oldImage != null && !oldImage.equals(updatedProduct.getImage())) {
+            fileService.deleteFile(oldImage);
+        }
          return productMapper.toDao(updatedProduct);
     }
     @Override
@@ -73,21 +77,7 @@ public class ProductServiceImpl implements ProductService{
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm"));
 
         // 🔥 XÓA FILE ẢNH TRONG Ổ CỨNG
-        try {
-            String imageUrl = product.getImage();
-
-            if (imageUrl != null && imageUrl.contains("/uploads/")) {
-                String fileName = imageUrl.substring(imageUrl.lastIndexOf("/uploads/") + 9);
-
-                Path filePath = Paths.get("uploads", fileName);
-
-                Files.deleteIfExists(filePath);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Không xóa được file ảnh: " + e.getMessage());
-        }
-
+        fileService.deleteFileByUrl(product.getImage());
         // 🔥 XÓA DB
         productRepository.deleteById(productId);
     }

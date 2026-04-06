@@ -12,7 +12,8 @@ import java.util.List;
 public interface UserGroupMapper {
     UserGroup toEntity(UserGroupRequest userGroupRequest);
     UserGroupResponse toDao(UserGroup userGroup);
-    List<UserGroupResponse> toListDao(List<UserGroup> userGroups);
     UserGroup toData(UserGroupChangeRequest userGroupChangeRequest);
     void update(UserGroupChangeRequest edit, @MappingTarget UserGroup userGroup);
+    List<UserGroupResponse> toListDao(List<UserGroup> userGroups);
+
 }

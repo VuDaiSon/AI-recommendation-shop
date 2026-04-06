@@ -1,19 +1,17 @@
 package com.example.recommendershop.dto.order.response;
 
-import com.example.recommendershop.entity.Order;
 
 import java.util.List;
 
 public class AdminEditResponse {
-    private Order order;
-    private List<String> orderStatuses;
+    private final AdminOrderDetailDTO order;    private final List<String> orderStatuses;
 
-    public AdminEditResponse(Order order, List<String> orderStatuses) {
+    public AdminEditResponse(AdminOrderDetailDTO order, List<String> orderStatuses) {
         this.order = order;
         this.orderStatuses = orderStatuses;
     }
 
-    public Order getOrder() {
+    public AdminOrderDetailDTO getOrder() {
         return order;
     }
 

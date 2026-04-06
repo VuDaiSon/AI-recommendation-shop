@@ -25,7 +25,7 @@ public class RoleServiceImpl implements RoleService{
 
     @Override
     public RoleResponse create(RoleRequest roleRequest) {
-        permissionCheck.checkPermission("admin");
+        permissionCheck.checkPermission("ROLE_GROUP_MANAGE");
         if(roleRepository.findByName(roleRequest.getName()) != null){
             throw new MasterException(HttpStatus.BAD_REQUEST, "Quyền đã tồn tại");
         }

@@ -7,10 +7,7 @@ import com.example.recommendershop.dto.ResponseData;
 import com.example.recommendershop.dto.cartDetail.CartDetailResponse;
 import com.example.recommendershop.dto.order.request.OrderRequest;
 import com.example.recommendershop.dto.cart.response.CartResponse;
-import com.example.recommendershop.dto.order.response.AdminEditResponse;
-import com.example.recommendershop.dto.order.response.CheckOutViewModel;
-import com.example.recommendershop.dto.order.response.OrderResponse;
-import com.example.recommendershop.dto.order.response.ProductInOrder;
+import com.example.recommendershop.dto.order.response.*;
 import com.example.recommendershop.dto.user.response.UserResponse;
 import com.example.recommendershop.entity.*;
 import com.example.recommendershop.exception.MasterException;
@@ -255,8 +252,8 @@ public class OrderServiceImpl implements OrderService {
                 "Đã nhận hàng"
         );
 
-        return new AdminEditResponse(order, statuses);
-    }
+        AdminOrderDetailDTO dto = orderMapper.toAdminDTO(order);
+        return new AdminEditResponse(dto, statuses);    }
 
     public ResponseData<?> AdminEdit(UUID id, Order updatedOrder) {
         if (!id.equals(updatedOrder.getOrderId())) {

@@ -1,6 +1,7 @@
 package com.example.recommendershop.mapper;
 
 import com.example.recommendershop.dto.order.request.OrderRequest;
+import com.example.recommendershop.dto.order.response.AdminOrderDetailDTO;
 import com.example.recommendershop.dto.order.response.OrderResponse;
 import com.example.recommendershop.dto.order.response.ProductInOrder;
 import com.example.recommendershop.dto.user.response.UserResponse;
@@ -18,4 +19,6 @@ public interface OrderMapper {
     List<ProductInOrder> toListDao(List<Product> products);
     Order toEntity(OrderRequest orderRequest);
     List<OrderResponse> toListResponse(List<Order> orders);
+    AdminOrderDetailDTO toAdminDTO(Order order);
+
 }

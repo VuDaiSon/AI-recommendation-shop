@@ -16,4 +16,5 @@ public class Validator {
             throw new MasterException(status, message);
         }
     }
+
 }

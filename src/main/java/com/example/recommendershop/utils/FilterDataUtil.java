@@ -31,4 +31,5 @@ public class FilterDataUtil {
     public static PageRequest buildPageRequestDefault(String field, Integer page, Integer pageSize) {
         return PageRequest.of(page, pageSize, Sort.by(field).ascending());
     }
+
 }
