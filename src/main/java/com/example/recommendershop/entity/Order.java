@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -23,7 +23,7 @@ public class Order {
 
     @Column(name = "date")
     @CreationTimestamp
-    private Date date;
+    private LocalDateTime date;
 
     @Column(name = "totalValue")
     private Double totalValue;

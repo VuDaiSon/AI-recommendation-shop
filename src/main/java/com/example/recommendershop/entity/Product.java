@@ -39,8 +39,12 @@ public class Product {
     @Column(name = "color")
     private String color;
 
+    @Column(name = "mainImage")
+    private String mainImage;
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image")
-    private String image;
+    private List<String> image;
 
     @Column(name = "price")
     private Double price;

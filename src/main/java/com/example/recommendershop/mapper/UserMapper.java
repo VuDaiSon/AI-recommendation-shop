@@ -1,5 +1,6 @@
 package com.example.recommendershop.mapper;
 
+import com.example.recommendershop.dto.user.request.UserEditRequest;
 import com.example.recommendershop.dto.user.request.UserRequest;
 import com.example.recommendershop.dto.user.response.UserInfor;
 import com.example.recommendershop.dto.admin.response.UserViewForAdmin;
@@ -12,6 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     User toEntity(UserRequest userRequest);
+    void update(UserEditRequest request, @MappingTarget User user);
     UserInfor toDao(User user);
     List<UserViewForAdmin> toListDao(List<User> users);
     void update(UserRequest userRequest, @MappingTarget User user);

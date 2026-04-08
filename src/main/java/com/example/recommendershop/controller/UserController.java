@@ -1,9 +1,7 @@
 package com.example.recommendershop.controller;
 
 import com.example.recommendershop.dto.ResponseData;
-import com.example.recommendershop.dto.user.request.ChangePasswordRequest;
-import com.example.recommendershop.dto.user.request.LoginRequest;
-import com.example.recommendershop.dto.user.request.UserRequest;
+import com.example.recommendershop.dto.user.request.*;
 import com.example.recommendershop.dto.user.response.UserInfor;
 import com.example.recommendershop.service.user.UserService;
 import jakarta.validation.Valid;
@@ -33,26 +31,25 @@ public class UserController {
     public void logout() {
         userService.logout();
     }
-//    @PutMapping("/forgot-password")
-//    public ResponseData<String> resetPassword(@RequestParam(name = "email") String email){
-//        userService.forgotPasword(email);
-//        return new ResponseData<>(HttpStatus.OK.value(), "New password đã được gửi về email của bạn !");
-//    }
+
     @GetMapping("/{userId}")
     public UserInfor getById(@PathVariable(name = "userId")UUID userId){
         return userService.detail(userId);
     }
     @PutMapping("/{userId}")
-    public UserInfor edit(@PathVariable(name = "userId") UUID userId, @RequestBody UserRequest userRequest){
-        return userService.update(userId, userRequest);
+    public UserInfor edit(@PathVariable(name = "userId") UUID userId, @RequestBody UserEditRequest userEditRequest){
+        return userService.update(userId, userEditRequest);
     }
     @PutMapping("/{userId}/change-password")
     public ResponseData<?> change(@PathVariable(name = "userId")UUID userId, @RequestBody ChangePasswordRequest changePasswordRequest){
         return userService.changePassword(userId, changePasswordRequest);
     }
-//    @PutMapping("/forgot-password")
-//    public ResponseData<?> resetPassword(@RequestParam String email){
-//        return userService.forgotPassword(email);
-//    }
+    @PostMapping("/forgot-password")
+    public ResponseData<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return userService.forgotPassword(request.getEmail());
+    }   @PostMapping("/reset-password")
+    public ResponseData<?> resetPassword(@RequestBody ResetPasswordRequest request){
+        return userService.resetPassword(request);
+    }
 
 }

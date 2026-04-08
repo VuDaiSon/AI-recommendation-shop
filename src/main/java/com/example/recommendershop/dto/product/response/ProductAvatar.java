@@ -17,7 +17,7 @@ public class ProductAvatar extends BaseDto {
     private UUID productId;
     private String name;
     private int quantity;
-    private String image;
+    private String mainImage;
     private Double price;
     private Date date;
 }

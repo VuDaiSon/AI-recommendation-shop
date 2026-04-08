@@ -4,6 +4,7 @@ import com.example.recommendershop.enums.Sex;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +19,9 @@ public class ProductRequest {
     @NotNull
     private int quantity;
     @NotNull
-    private String image;
+    private String mainImage;
+    @NotNull
+    private List<String> image;
     @NotNull
     private String color;
     @NotNull

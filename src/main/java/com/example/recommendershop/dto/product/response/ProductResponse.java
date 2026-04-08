@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,7 +20,8 @@ public class ProductResponse {
     private String description;
     private int quantity;
     private String color;
-    private String image;
+    private String mainImage;
+    private List<String> image;
     private Double price;
     private Integer age;
     private Sex sex;

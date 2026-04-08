@@ -2,7 +2,6 @@ package com.example.recommendershop.service.userGroup;
 
 import com.example.recommendershop.authorization.PermissionCheck;
 import com.example.recommendershop.dto.ResponseData;
-import com.example.recommendershop.dto.userGroup.UserGroupChangeRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupRequest;
 import com.example.recommendershop.dto.userGroup.UserGroupResponse;
 import com.example.recommendershop.entity.RoleGroup;
@@ -105,11 +104,4 @@ public class UserGroupServiceImpl implements UserGroupService{
         return new ResponseData<>(HttpStatus.OK.value(), "Đã xóa thành công");
     }
 
-    @Override
-    public UserGroupResponse editUserGroup(UUID userGroupId, UserGroupChangeRequest edit) {
-        permissionCheck.checkPermission("USER_GROUP_MANAGE");
-        UserGroup userGroup = userGroupRepository.findById(userGroupId).orElseThrow(()-> new MasterException(HttpStatus.NOT_FOUND, "Nhóm quyền không tồn tại"));
-        userGroupMapper.update(edit, userGroup);
-        return userGroupMapper.toDao(userGroup);
-    }
 }

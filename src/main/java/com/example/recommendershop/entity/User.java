@@ -7,11 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 
 @Entity
 @Setter
@@ -27,6 +28,8 @@ public class User {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "avatar")
+    private String avatar;
     @Column(name = "email")
     private String email;
 
@@ -43,7 +46,11 @@ public class User {
 
     @Column(name = "age")
     private Integer age;
+    @Column(name = "reset_token")
+    private String resetToken;
 
+    @Column(name = "reset_token_expiry")
+    private Date resetTokenExpiry;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Sex sex;

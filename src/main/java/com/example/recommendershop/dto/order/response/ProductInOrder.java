@@ -13,6 +13,6 @@ public class ProductInOrder {
 
     private String name;
     private Double price;
-    private String image;
+    private String mainImage;
 
 }

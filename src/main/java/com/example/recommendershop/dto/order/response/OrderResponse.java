@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderResponse extends BaseDto {
     private UUID orderId;
-    private Date date;
+    private LocalDateTime date;
     private Double totalValue;
     private String status;
     private String address;

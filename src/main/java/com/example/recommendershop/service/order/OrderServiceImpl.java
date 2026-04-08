@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<CartDetailResponse> cartDetailResponses = cartDetails.stream().map(cartDetail -> {
             Product product = cartDetail.getProduct();
-            ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getImage());
+            ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getMainImage());
             return new CartDetailResponse(
                     cartDetail.getCartDetailId(),
                     cartDetail.getQuantity(),
@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<CartDetailResponse> cartDetailResponses = cartDetails.stream().map(cartDetail -> {
             Product product = cartDetail.getProduct();
-            ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getImage());
+            ProductInOrder productInOrder = new ProductInOrder(product.getName(), product.getPrice(), product.getMainImage());
             return new CartDetailResponse(
                     cartDetail.getCartDetailId(),
                     cartDetail.getQuantity(),

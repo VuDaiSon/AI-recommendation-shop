@@ -1,9 +1,7 @@
     package com.example.recommendershop.service.user;
 
     import com.example.recommendershop.dto.ResponseData;
-    import com.example.recommendershop.dto.user.request.ChangePasswordRequest;
-    import com.example.recommendershop.dto.user.request.LoginRequest;
-    import com.example.recommendershop.dto.user.request.UserRequest;
+    import com.example.recommendershop.dto.user.request.*;
     import com.example.recommendershop.dto.user.response.UserInfor;
     import com.example.recommendershop.entity.Role;
     import com.example.recommendershop.entity.RoleGroup;
@@ -17,8 +15,10 @@
     import com.example.recommendershop.repository.UserRepository;
     import com.example.recommendershop.config.PasswordEncoder;
 //    import com.example.recommendershop.service.emailMessage.EmailService;
+    import com.example.recommendershop.service.emailMessage.EmailService;
     import com.example.recommendershop.validation.Validator;
     import jakarta.servlet.http.HttpSession;
+    import org.springframework.beans.factory.annotation.Value;
     import org.springframework.http.HttpStatus;
     import org.springframework.stereotype.Service;
 
@@ -26,6 +26,8 @@
 
     @Service
     public class UserServiceImpl implements UserService {
+        @Value("${app.frontend.url}")
+        private String frontendUrl;
         private final UserRepository userRepository;
         private final UserGroupRepository userGroupRepository;
         private final RoleGroupRepository roleGroupRepository;
@@ -34,8 +36,8 @@
         private final UserMapper userMapper;
         private final PasswordEncoder passwordEncoder;
         private final Validator validator;
-
-        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator) {
+        private final EmailService emailService;
+        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator, EmailService emailService) {
             this.userRepository = userRepository;
             this.userGroupRepository = userGroupRepository;
             this.roleGroupRepository = roleGroupRepository;
@@ -44,6 +46,7 @@
             this.userMapper = userMapper;
             this.passwordEncoder = passwordEncoder;
             this.validator = validator;
+            this.emailService = emailService;
         }
 
         @Override
@@ -113,13 +116,11 @@
             return userMapper.toDao(userRepository.getReferenceById(userId));
         }
 
-        public UserInfor update(UUID userId, UserRequest userRequest) {
+        public UserInfor update(UUID userId, UserEditRequest userEditRequest) {
 
             User existingUser = userRepository.findById(userId)
                     .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
-            existingUser.setName(userRequest.getName());
-            existingUser.setPhone(userRequest.getPhone());
-            existingUser.setAddress(userRequest.getAddress());
+            userMapper.update(userEditRequest, existingUser);
 
             User updatedUser = userRepository.save(existingUser);
 
@@ -152,41 +153,41 @@
             }
             return new ResponseData<>(HttpStatus.OK.value(), "Đổi mật khẩu thành công");
         }
+        @Override
+        public ResponseData<?> forgotPassword(String email) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Email không tồn tại"));
 
-//        private String generateRandomPassword() {
-//            String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//            String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
-//            String numbers = "0123456789";
-//            String specialChars = "!@#$%&_/?";
-//            String allChars = upperCaseLetters + lowerCaseLetters + numbers + specialChars;
-//            Random random = new Random();
-//            StringBuilder password = new StringBuilder();
-//            for (int i = 0; i < 10; i++) {
-//                password.append(allChars.charAt(random.nextInt(allChars.length())));
-//            }
-//            return password.toString();
-//        }
-//        @Override
-//        public ResponseData<?> forgotPassword(String email) {
-//            Optional<User> userOptional = userRepository.findByEmail(email);
-//            if (userOptional.isPresent()) {
-//                User user = userOptional.get();
-//
-//                String newPassword = generateRandomPassword();
-//
-//                user.setPassword((newPassword));
-//                userRepository.save(user);
-//
-//                EmailMessage emailMessage = new EmailMessage();
-//                emailMessage.setTo(email);
-//                emailMessage.setSubject("Reset password");
-//                emailMessage.setBody("Your new password: " + newPassword);
-//                emailService.sendEmail(emailMessage);
-//            } else {
-//                throw new MasterException(HttpStatus.NOT_FOUND, "không tìm thấy tài khoản");
-//            }
-//            return new ResponseData<>(HttpStatus.OK.value(), "đã gửi mật khẩu mới đến email của bạn");
-//        }
+            String token = UUID.randomUUID().toString();
 
+            user.setResetToken(token);
+            user.setResetTokenExpiry(new Date(System.currentTimeMillis() + 10 * 60 * 1000)); // 10 phút
 
+            userRepository.save(user);
+
+            String link = frontendUrl + "/reset-password?token=" + token;
+            // TODO: gửi email
+            emailService.sendResetPassword(user.getEmail(), link);
+            return new ResponseData<>(200, "Đã gửi link reset mật khẩu vào mail của bạn");
+        }
+        @Override
+        public ResponseData<?> resetPassword(ResetPasswordRequest request) {
+
+            User user = userRepository.findByResetToken(request.getToken())
+                    .orElseThrow(() -> new MasterException(HttpStatus.BAD_REQUEST, "Token không hợp lệ"));
+
+            if (user.getResetTokenExpiry().before(new Date())) {
+                throw new MasterException(HttpStatus.BAD_REQUEST, "Token đã hết hạn");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+            // clear token
+            user.setResetToken(null);
+            user.setResetTokenExpiry(null);
+
+            userRepository.save(user);
+
+            return new ResponseData<>(200, "Đổi mật khẩu thành công");
+        }
     }

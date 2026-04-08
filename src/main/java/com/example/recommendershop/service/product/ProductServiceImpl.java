@@ -58,16 +58,47 @@ public class ProductServiceImpl implements ProductService{
     @Transactional
     public ProductResponse update(UUID productId, ProductRequest productRequest) {
         permissionCheck.checkPermission("update");
-        Product product = validator.checkEntityNotExists(productRepository.findById(productId), HttpStatus.NOT_FOUND, "Sảm phẩm không tồn tại");
-        Category category = validator.checkEntityNotExists(categoryRepository.findById(productRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
-        String oldImage = product.getImage();
+
+        Product product = validator.checkEntityNotExists(
+                productRepository.findById(productId),
+                HttpStatus.NOT_FOUND,
+                "Sảm phẩm không tồn tại"
+        );
+
+        Category category = validator.checkEntityNotExists(
+                categoryRepository.findById(productRequest.getCategoryId()),
+                HttpStatus.NOT_FOUND,
+                "Danh mục không tồn tại"
+        );
+
+        // 🔥 FIX: clone list
+        List<String> oldImages = product.getImage() != null
+                ? new ArrayList<>(product.getImage())
+                : new ArrayList<>();
+
+        String oldMainImage = product.getMainImage();
+
+        // update data
         productMapper.update(productRequest, product);
         product.setCategory(category);
+
         Product updatedProduct = productRepository.save(product);
-        if (oldImage != null && !oldImage.equals(updatedProduct.getImage())) {
-            fileService.deleteFile(oldImage);
+
+        List<String> newImages = product.getImage();
+
+        // 🔥 XÓA ảnh phụ bị remove
+        for (String oldImg : oldImages) {
+            if (newImages == null || !newImages.contains(oldImg)) {
+                fileService.deleteFileByUrl(oldImg);
+            }
         }
-         return productMapper.toDao(updatedProduct);
+
+        // 🔥 XÓA main image nếu bị đổi
+        if (oldMainImage != null && !oldMainImage.equals(product.getMainImage())) {
+            fileService.deleteFileByUrl(oldMainImage);
+        }
+
+        return productMapper.toDao(updatedProduct);
     }
     @Override
     public void delete(UUID productId) {
@@ -77,8 +108,12 @@ public class ProductServiceImpl implements ProductService{
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm"));
 
         // 🔥 XÓA FILE ẢNH TRONG Ổ CỨNG
-        fileService.deleteFileByUrl(product.getImage());
-        // 🔥 XÓA DB
+        if (product.getImage() != null) {
+            product.getImage().forEach(fileService::deleteFileByUrl);
+        }
+
+// xóa main image nếu có
+        fileService.deleteFileByUrl(product.getMainImage());
         productRepository.deleteById(productId);
     }
     public ProductResponse detail(UUID productId){
