@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -216,18 +217,47 @@ public class OrderServiceImpl implements OrderService {
 
     public ResponseData<?> cancelOrder(UUID orderId) {
         if (orderId == null) {
-            throw new MasterException(HttpStatus.NOT_FOUND, "không tìm thấy đơn hàng");
+            throw new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
         }
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng"));
 
         try {
+            // 🔥 check thời gian
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime orderTime = order.getDate();
+
+            long hours = java.time.Duration.between(orderTime, now).toHours();
+
+            if (hours > 48) {
+                throw new MasterException(
+                        HttpStatus.BAD_REQUEST,
+                        "Đơn hàng đã quá 48 giờ, không thể hủy"
+                );
+            }
+
+            // 🔥 check nếu đã hủy rồi thì không làm lại
+            if ("Đã hủy".equalsIgnoreCase(order.getStatus())) {
+                throw new MasterException(
+                        HttpStatus.BAD_REQUEST,
+                        "Đơn hàng đã bị hủy trước đó"
+                );
+            }
+
+            // 🔥 cập nhật trạng thái
             order.setStatus("Đã hủy");
             orderRepository.save(order);
-            return new ResponseData<>(HttpStatus.OK.value(), "đã hủy đơn hàng thành công");
+
+            return new ResponseData<>(HttpStatus.OK.value(), "Hủy đơn hàng thành công");
+
+        } catch (MasterException ex) {
+            throw ex;
         } catch (Exception ex) {
-            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred:" + ex.getMessage());
+            return new ResponseData<>(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "Lỗi hệ thống: " + ex.getMessage()
+            );
         }
     }
 
