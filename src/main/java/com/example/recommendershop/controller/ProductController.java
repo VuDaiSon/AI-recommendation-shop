@@ -38,7 +38,7 @@ public class ProductController {
         return productService.detail(productId);
     }
     @CrossOrigin
-    @GetMapping("/")
+    @GetMapping("")
     public BasePage<ProductAvatar> findAll(@ParameterObject ApiListBaseRequest listRequest){
         return productService.getAll(listRequest);
     }

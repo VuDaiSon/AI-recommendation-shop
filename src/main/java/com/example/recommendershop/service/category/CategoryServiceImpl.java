@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 🔥 nếu ảnh thay đổi → xóa ảnh cũ
         if (oldImage != null && !oldImage.equals(saved.getImage())) {
-            fileService.deleteFile(oldImage);
+            fileService.deleteFileByUrl(oldImage);
         }
 
         return categoryMapper.toDao(saved);

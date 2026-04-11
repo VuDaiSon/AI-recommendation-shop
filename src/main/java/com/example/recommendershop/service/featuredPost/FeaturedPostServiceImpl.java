@@ -50,7 +50,7 @@ private final FileService fileService;
         featuredPost.setCategory(category);
         FeaturedPost updatedfeaturedPost = featuredPostRepository.save(featuredPost);
         if (oldImage != null && !oldImage.equals(updatedfeaturedPost.getUrl())) {
-            fileService.deleteFile(oldImage);
+            fileService.deleteFileByUrl(oldImage);
         }
 
         return featuredPostMapper.toDao(updatedfeaturedPost);
