@@ -16,6 +16,7 @@
     import com.example.recommendershop.config.PasswordEncoder;
 //    import com.example.recommendershop.service.emailMessage.EmailService;
     import com.example.recommendershop.service.emailMessage.EmailService;
+    import com.example.recommendershop.service.file.FileService;
     import com.example.recommendershop.validation.Validator;
     import jakarta.servlet.http.HttpSession;
     import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +38,8 @@
         private final PasswordEncoder passwordEncoder;
         private final Validator validator;
         private final EmailService emailService;
-        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator, EmailService emailService) {
+        private final FileService fileService;
+        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator, EmailService emailService, FileService fileService) {
             this.userRepository = userRepository;
             this.userGroupRepository = userGroupRepository;
             this.roleGroupRepository = roleGroupRepository;
@@ -47,6 +49,7 @@
             this.passwordEncoder = passwordEncoder;
             this.validator = validator;
             this.emailService = emailService;
+            this.fileService = fileService;
         }
 
         @Override
@@ -120,10 +123,12 @@
 
             User existingUser = userRepository.findById(userId)
                     .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
+           String oldAvatar = existingUser.getAvatar();
             userMapper.update(userEditRequest, existingUser);
-
             User updatedUser = userRepository.save(existingUser);
-
+            if (oldAvatar != null && !oldAvatar.equals(updatedUser.getAvatar())) {
+                fileService.deleteFileByUrl(oldAvatar);
+            }
             httpSession.setAttribute("UserId", updatedUser.getUserId());
             httpSession.setAttribute("UserName", updatedUser.getName());
 

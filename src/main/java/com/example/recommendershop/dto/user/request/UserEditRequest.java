@@ -23,9 +23,6 @@ public class UserEditRequest {
     @NotNull
     private String address;
     @NotNull
-    private String password;
-
-    @NotNull
     private Integer age;
     @NotNull
     private Sex sex;
