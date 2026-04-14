@@ -89,13 +89,13 @@ public class ProductServiceImpl implements ProductService{
         // 🔥 XÓA ảnh phụ bị remove
         for (String oldImg : oldImages) {
             if (newImages == null || !newImages.contains(oldImg)) {
-                fileService.deleteFileByUrl(oldImg);
+                fileService.delete(oldImg);
             }
         }
 
         // 🔥 XÓA main image nếu bị đổi
         if (oldMainImage != null && !oldMainImage.equals(product.getMainImage())) {
-            fileService.deleteFileByUrl(oldMainImage);
+            fileService.delete(oldMainImage);
         }
 
         return productMapper.toDao(updatedProduct);
@@ -109,11 +109,11 @@ public class ProductServiceImpl implements ProductService{
 
         // 🔥 XÓA FILE ẢNH TRONG Ổ CỨNG
         if (product.getImage() != null) {
-            product.getImage().forEach(fileService::deleteFileByUrl);
+            product.getImage().forEach(fileService::delete);
         }
 
 // xóa main image nếu có
-        fileService.deleteFileByUrl(product.getMainImage());
+        fileService.delete(product.getMainImage());
         productRepository.deleteById(productId);
     }
     public ProductResponse detail(UUID productId){

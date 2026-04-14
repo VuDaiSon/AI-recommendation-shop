@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 🔥 nếu ảnh thay đổi → xóa ảnh cũ
         if (oldImage != null && !oldImage.equals(saved.getImage())) {
-            fileService.deleteFileByUrl(oldImage);
+            fileService.delete(oldImage);
         }
 
         return categoryMapper.toDao(saved);
@@ -83,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm"));
 
         // 🔥 XÓA FILE ẢNH TRONG Ổ CỨNG
-        fileService.deleteFileByUrl(category.getImage());
+        fileService.delete(category.getImage());
 
         categoryRepository.deleteById(categoryId);
     }

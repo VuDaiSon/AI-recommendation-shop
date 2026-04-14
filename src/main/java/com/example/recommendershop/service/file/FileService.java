@@ -1,51 +1,53 @@
 package com.example.recommendershop.service.file;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
+
+import java.util.Map;
 
 @Service
 public class FileService {
 
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
 
-    // ❌ KHÔNG DÙNG backendUrl nữa
+    public FileService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
+
     public String post(MultipartFile file) {
         try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("folder", "products")
+            );
 
-            Path path = Paths.get(uploadDir, fileName);
-            Files.createDirectories(path.getParent());
-
-            Files.write(path, file.getBytes());
-
-            // ✅ CHUẨN PRODUCTION: chỉ trả PATH
-            return "/uploads/" + fileName;
+            return uploadResult.get("secure_url").toString();
 
         } catch (Exception e) {
             throw new RuntimeException("Upload lỗi: " + e.getMessage());
         }
     }
 
-    public void deleteFileByUrl(String imageUrl) {
+    public void delete(String imageUrl) {
         try {
-            if (imageUrl == null || imageUrl.isEmpty()) return;
+            if (imageUrl == null) return;
 
-            // lấy tên file từ URL hoặc PATH
-            String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            // lấy public_id từ URL
+            String[] parts = imageUrl.split("/");
+            String fileName = parts[parts.length - 1];
+            String publicId = "products/" + fileName.substring(0, fileName.lastIndexOf("."));
 
-            Path path = Paths.get(uploadDir, fileName);
-
-            Files.deleteIfExists(path);
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
 
         } catch (Exception e) {
-            System.out.println("Không xóa được file: " + e.getMessage());
+            System.out.println("Không xóa được ảnh: " + e.getMessage());
         }
     }
 }

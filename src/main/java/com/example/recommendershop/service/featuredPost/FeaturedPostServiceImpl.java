@@ -50,7 +50,7 @@ private final FileService fileService;
         featuredPost.setCategory(category);
         FeaturedPost updatedfeaturedPost = featuredPostRepository.save(featuredPost);
         if (oldImage != null && !oldImage.equals(updatedfeaturedPost.getUrl())) {
-            fileService.deleteFileByUrl(oldImage);
+            fileService.delete(oldImage);
         }
 
         return featuredPostMapper.toDao(updatedfeaturedPost);
@@ -63,7 +63,7 @@ private final FileService fileService;
         FeaturedPost featuredPost = featuredPostRepository.findById(featuredPostId)
                 .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy banner"));
 
-        fileService.deleteFileByUrl(featuredPost.getUrl());
+        fileService.delete(featuredPost.getUrl());
         Category category = featuredPost.getCategory();
         if (category != null) {
             category.setFeatured(null);
