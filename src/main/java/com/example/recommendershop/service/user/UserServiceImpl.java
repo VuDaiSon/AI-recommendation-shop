@@ -127,7 +127,7 @@
             userMapper.update(userEditRequest, existingUser);
             User updatedUser = userRepository.save(existingUser);
             if (oldAvatar != null && !oldAvatar.equals(updatedUser.getAvatar())) {
-                fileService.deleteFileByUrl(oldAvatar);
+                fileService.delete(oldAvatar);
             }
             httpSession.setAttribute("UserId", updatedUser.getUserId());
             httpSession.setAttribute("UserName", updatedUser.getName());
