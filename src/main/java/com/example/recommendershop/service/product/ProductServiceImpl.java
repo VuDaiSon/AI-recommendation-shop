@@ -12,6 +12,7 @@ import com.example.recommendershop.mapper.ProductMapper;
 import com.example.recommendershop.repository.*;
 import com.example.recommendershop.service.file.FileService;
 import com.example.recommendershop.utils.FilterDataUtil;
+import com.example.recommendershop.validation.ImageValidator;
 import com.example.recommendershop.validation.Validator;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
@@ -33,20 +34,31 @@ public class ProductServiceImpl implements ProductService{
     private final PermissionCheck permissionCheck;
     private final Validator validator;
     private final FileService fileService;
+    private final ImageValidator imageValidator;
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, PermissionCheck permissionCheck, Validator validator, FileService fileService){
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, PermissionCheck permissionCheck, Validator validator, FileService fileService, ImageValidator imageValidator){
         this.productRepository =productRepository;
         this.productMapper = productMapper;
         this.categoryRepository = categoryRepository;
         this.permissionCheck = permissionCheck;
         this.validator = validator;
         this.fileService = fileService;
+        this.imageValidator = imageValidator;
     }
     @Override
     @Transactional
 
     public ProductResponse create(ProductRequest productRequest) {
         permissionCheck.checkPermission("add");
+        imageValidator.validateMainImage(productRequest.getMainImage());
+        imageValidator.validateFolder(productRequest.getMainImage(), "products");
+
+        imageValidator.validateImages(productRequest.getImage());
+
+        if (productRequest.getImage() != null) {
+            productRequest.getImage()
+                    .forEach(img -> imageValidator.validateFolder(img, "products"));
+        }
         validator.checkEntityExists(productRepository.findProductByName(productRequest.getName()), HttpStatus.BAD_REQUEST, "Sản phẩm đã tồn tại");
         Category category = validator.checkEntityNotExists(categoryRepository.findById(productRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
         Product product = productMapper.toEntity(productRequest);
@@ -77,7 +89,15 @@ public class ProductServiceImpl implements ProductService{
                 : new ArrayList<>();
 
         String oldMainImage = product.getMainImage();
+        imageValidator.validateMainImage(productRequest.getMainImage());
+        imageValidator.validateFolder(productRequest.getMainImage(), "products");
 
+        imageValidator.validateImages(productRequest.getImage());
+
+        if (productRequest.getImage() != null) {
+            productRequest.getImage()
+                    .forEach(img -> imageValidator.validateFolder(img, "products"));
+        }
         // update data
         productMapper.update(productRequest, product);
         product.setCategory(category);

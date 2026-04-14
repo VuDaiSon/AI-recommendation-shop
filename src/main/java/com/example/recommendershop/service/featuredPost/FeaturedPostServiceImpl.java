@@ -11,6 +11,7 @@ import com.example.recommendershop.mapper.FeaturedPostMapper;
 import com.example.recommendershop.repository.CategoryRepository;
 import com.example.recommendershop.repository.FeaturedPostRepository;
 import com.example.recommendershop.service.file.FileService;
+import com.example.recommendershop.validation.ImageValidator;
 import com.example.recommendershop.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,10 +30,14 @@ private final Validator validator;
 private final CategoryRepository categoryRepository;
 private final FeaturedPostMapper featuredPostMapper;
 private final FileService fileService;
+private final ImageValidator imageValidator;
+
     @Override
-    public FeaturedPostResponse create(FeaturedPostRequest featuredPostRequest) {
+    public FeaturedPostResponse create(FeaturedPostRequest featuredPostRequest ) {
     permissionCheck.checkPermission("add");
-    validator.checkEntityExists(featuredPostRepository.findByUrl(featuredPostRequest.getUrl()), HttpStatus.BAD_REQUEST, "Banner đã tồn tại");
+        imageValidator.validateMainImage(featuredPostRequest.getUrl());
+        imageValidator.validateFolder(featuredPostRequest.getUrl(), "banners");
+        validator.checkEntityExists(featuredPostRepository.findByUrl(featuredPostRequest.getUrl()), HttpStatus.BAD_REQUEST, "Banner đã tồn tại");
     Category category = validator.checkEntityNotExists(categoryRepository.findById(featuredPostRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
         FeaturedPost featuredPost = featuredPostMapper.toEntity(featuredPostRequest);
         featuredPost.setCategory(category);
@@ -46,6 +51,8 @@ private final FileService fileService;
         FeaturedPost featuredPost = validator.checkEntityNotExists(featuredPostRepository.findById(featuredPostId), HttpStatus.NOT_FOUND, "Sảm phẩm không tồn tại");
         Category category = validator.checkEntityNotExists(categoryRepository.findById(featuredPostRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
         String oldImage = featuredPost.getUrl();
+        imageValidator.validateMainImage(featuredPostRequest.getUrl());
+        imageValidator.validateFolder(featuredPostRequest.getUrl(), "banners");
         featuredPostMapper.update(featuredPostRequest, featuredPost);
         featuredPost.setCategory(category);
         FeaturedPost updatedfeaturedPost = featuredPostRepository.save(featuredPost);

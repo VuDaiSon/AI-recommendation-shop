@@ -12,6 +12,7 @@ import com.example.recommendershop.mapper.CategoryMapper;
 import com.example.recommendershop.repository.*;
 import com.example.recommendershop.service.file.FileService;
 import com.example.recommendershop.utils.FilterDataUtil;
+import com.example.recommendershop.validation.ImageValidator;
 import com.example.recommendershop.validation.Validator;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -26,18 +27,24 @@ public class CategoryServiceImpl implements CategoryService {
     private final PermissionCheck permissionCheck;
     private final Validator validator;
     private final FileService fileService;
+    private final ImageValidator imageValidator;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, PermissionCheck permissionCheck, Validator validator, FileService fileService) {
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, PermissionCheck permissionCheck, Validator validator, FileService fileService, ImageValidator imageValidator) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
         this.permissionCheck = permissionCheck;
         this.validator = validator;
         this.fileService = fileService;
+        this.imageValidator = imageValidator;
+
     }
 
     @Override
     public CategoryResponse create(CategoryRequest categoryRequest) {
         permissionCheck.checkPermission("add");
+        imageValidator.validateMainImage(categoryRequest.getImage());
+        imageValidator.validateFolder(categoryRequest.getImage(), "categories");
         validator.checkEntityExists(categoryRepository.findCategoryByName(categoryRequest.getName()), HttpStatus.BAD_REQUEST, "Danh mục đã tồn tại");
         Category category = categoryRepository.save(categoryMapper.toEntity(categoryRequest));
         CategoryResponse categoryResponse = categoryMapper.toDao(category);
@@ -56,6 +63,8 @@ public class CategoryServiceImpl implements CategoryService {
         String oldImage = category.getImage();
 
         // update dữ liệu
+        imageValidator.validateMainImage(categoryRequest.getImage());
+        imageValidator.validateFolder(categoryRequest.getImage(), "categories");
         categoryMapper.update(categoryRequest, category);
 
         Category saved = categoryRepository.save(category);

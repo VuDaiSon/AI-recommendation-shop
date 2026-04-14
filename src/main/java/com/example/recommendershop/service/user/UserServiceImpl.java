@@ -14,9 +14,9 @@
     import com.example.recommendershop.repository.UserGroupRepository;
     import com.example.recommendershop.repository.UserRepository;
     import com.example.recommendershop.config.PasswordEncoder;
-//    import com.example.recommendershop.service.emailMessage.EmailService;
     import com.example.recommendershop.service.emailMessage.EmailService;
     import com.example.recommendershop.service.file.FileService;
+    import com.example.recommendershop.validation.ImageValidator;
     import com.example.recommendershop.validation.Validator;
     import jakarta.servlet.http.HttpSession;
     import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,8 @@
         private final Validator validator;
         private final EmailService emailService;
         private final FileService fileService;
-        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator, EmailService emailService, FileService fileService) {
+        private final ImageValidator imageValidator;
+        public UserServiceImpl(UserRepository userRepository,UserGroupRepository userGroupRepository, RoleGroupRepository roleGroupRepository, RoleRepository roleRepository,HttpSession httpSession, UserMapper userMapper, PasswordEncoder passwordEncoder, Validator validator, EmailService emailService, FileService fileService, ImageValidator imageValidator) {
             this.userRepository = userRepository;
             this.userGroupRepository = userGroupRepository;
             this.roleGroupRepository = roleGroupRepository;
@@ -50,6 +51,8 @@
             this.validator = validator;
             this.emailService = emailService;
             this.fileService = fileService;
+            this.imageValidator = imageValidator;
+
         }
 
         @Override
@@ -123,12 +126,21 @@
 
             User existingUser = userRepository.findById(userId)
                     .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
-           String oldAvatar = existingUser.getAvatar();
+
+            String oldAvatar = existingUser.getAvatar();
+
+            imageValidator.validateMainImage(userEditRequest.getAvatar());
+            imageValidator.validateFolder(userEditRequest.getAvatar(), "users");
+
             userMapper.update(userEditRequest, existingUser);
+
             User updatedUser = userRepository.save(existingUser);
-            if (oldAvatar != null && !oldAvatar.equals(updatedUser.getAvatar())) {
+
+            if (oldAvatar != null && updatedUser.getAvatar() != null
+                    && !oldAvatar.equals(updatedUser.getAvatar())) {
                 fileService.delete(oldAvatar);
             }
+
             httpSession.setAttribute("UserId", updatedUser.getUserId());
             httpSession.setAttribute("UserName", updatedUser.getName());
 
