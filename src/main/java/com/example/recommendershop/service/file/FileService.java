@@ -25,7 +25,11 @@ public class FileService {
             @SuppressWarnings("unchecked")
             Map<String, Object> uploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
-                    ObjectUtils.asMap("folder", "products")
+                    ObjectUtils.asMap(
+                            "folder", "products",
+                            "quality", "auto",
+                            "fetch_format", "auto"
+                    )
             );
 
             return uploadResult.get("secure_url").toString();
