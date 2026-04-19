@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface FeaturedPostRepository extends JpaRepository<FeaturedPost, UUID>, JpaSpecificationExecutor<FeaturedPost> {
     FeaturedPost findByUrl(String url);
+    boolean existsByCategory_CategoryId(UUID categoryId);
 }

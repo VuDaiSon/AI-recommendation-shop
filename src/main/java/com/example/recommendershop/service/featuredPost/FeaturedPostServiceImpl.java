@@ -39,6 +39,16 @@ private final ImageValidator imageValidator;
         imageValidator.validateFolder(featuredPostRequest.getUrl(), "banners");
         validator.checkEntityExists(featuredPostRepository.findByUrl(featuredPostRequest.getUrl()), HttpStatus.BAD_REQUEST, "Banner đã tồn tại");
     Category category = validator.checkEntityNotExists(categoryRepository.findById(featuredPostRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
+        boolean exists = featuredPostRepository.existsByCategory_CategoryId(
+                featuredPostRequest.getCategoryId()
+        );
+
+        if (exists) {
+            throw new MasterException(
+                    HttpStatus.CONFLICT,
+                    "Danh mục này đã có banner"
+            );
+        }
         FeaturedPost featuredPost = featuredPostMapper.toEntity(featuredPostRequest);
         featuredPost.setCategory(category);
         featuredPost = featuredPostRepository.save(featuredPost);
@@ -50,6 +60,16 @@ private final ImageValidator imageValidator;
         permissionCheck.checkPermission("update");
         FeaturedPost featuredPost = validator.checkEntityNotExists(featuredPostRepository.findById(featuredPostId), HttpStatus.NOT_FOUND, "Sảm phẩm không tồn tại");
         Category category = validator.checkEntityNotExists(categoryRepository.findById(featuredPostRequest.getCategoryId()), HttpStatus.NOT_FOUND, "Danh mục không tồn tại");
+        boolean exists = featuredPostRepository.existsByCategory_CategoryId(
+                featuredPostRequest.getCategoryId()
+        );
+        if (exists && !featuredPost.getCategory().getCategoryId()
+                .equals(featuredPostRequest.getCategoryId())) {
+            throw new MasterException(
+                    HttpStatus.CONFLICT,
+                    "Danh mục này đã có banner"
+            );
+        }
         String oldImage = featuredPost.getUrl();
         imageValidator.validateMainImage(featuredPostRequest.getUrl());
         imageValidator.validateFolder(featuredPostRequest.getUrl(), "banners");
