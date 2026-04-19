@@ -128,16 +128,20 @@
                     .orElseThrow(() -> new MasterException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng"));
 
             String oldAvatar = existingUser.getAvatar();
+            String newAvatar = userEditRequest.getAvatar();
 
-            imageValidator.validateMainImage(userEditRequest.getAvatar());
-            imageValidator.validateFolder(userEditRequest.getAvatar(), "users");
+            // 🔥 CHỈ validate khi avatar thay đổi
+            if (newAvatar != null && !newAvatar.equals(oldAvatar)) {
+                imageValidator.validateMainImage(newAvatar);
+                imageValidator.validateFolder(newAvatar, "users");
+            }
 
             userMapper.update(userEditRequest, existingUser);
 
             User updatedUser = userRepository.save(existingUser);
 
-            if (oldAvatar != null && updatedUser.getAvatar() != null
-                    && !oldAvatar.equals(updatedUser.getAvatar())) {
+            // 🔥 xóa ảnh cũ nếu đổi ảnh
+            if (oldAvatar != null && newAvatar != null && !oldAvatar.equals(newAvatar)) {
                 fileService.delete(oldAvatar);
             }
 
