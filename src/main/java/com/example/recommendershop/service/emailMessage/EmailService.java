@@ -1,10 +1,11 @@
 package com.example.recommendershop.service.emailMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 @Service
 public class EmailService {
@@ -16,19 +17,28 @@ public class EmailService {
 
     public void sendResetPassword(String to, String link) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
-            message.setFrom("tatbara2@gmail.com");
-            message.setTo(to);
-            message.setSubject("Reset mật khẩu");
-            message.setText("Click link để reset mật khẩu:\n" + link);
+            helper.setFrom("Recommender Shop <tatbara2@gmail.com>");
+            helper.setTo(to);
+            helper.setSubject("Reset mật khẩu");
+
+            String html = """
+                <div>
+                    <p>Click link để reset mật khẩu:</p>
+                    <a href="%s">%s</a>
+                </div>
+                """.formatted(link, link);
+
+            helper.setText(html, true);
 
             mailSender.send(message);
 
-            log.info("✅ Sent to {}", to);
+            log.info("✅ Email sent to {}", to);
 
         } catch (Exception e) {
-            log.error("❌ Send fail", e);
+            log.error("❌ Send mail failed", e);
         }
     }
 }
