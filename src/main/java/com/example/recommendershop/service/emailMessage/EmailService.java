@@ -1,44 +1,57 @@
 package com.example.recommendershop.service.emailMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
 
 @Service
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${brevo.api.key}")
+    private String apiKey;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public void sendResetPassword(String to, String link) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            String url = "https://api.brevo.com/v3/smtp/email";
 
-            helper.setFrom("Recommender Shop <a9e948001@smtp-brevo.com>");
-            helper.setTo(to);
-            helper.setSubject("Reset mật khẩu");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
 
-            String html = """
-            <div>
-                <p>Click link để reset mật khẩu:</p>
-                <a href="%s">%s</a>
-            </div>
-            """.formatted(link, link);
+            Map<String, Object> body = new HashMap<>();
+            body.put("sender", Map.of(
+                    "name", "Recommender Shop",
+                    "email", "a9e948001@smtp-brevo.com"
+            ));
 
-            helper.setText(html, true);
+            body.put("to", List.of(
+                    Map.of("email", to)
+            ));
 
-            mailSender.send(message);
+            body.put("subject", "Reset mật khẩu");
 
-            log.info("✅ EMAIL SENT TO: {}", to);
+            body.put("htmlContent",
+                    "<p>Click vào link để reset mật khẩu:</p>" +
+                            "<a href='" + link + "'>" + link + "</a>"
+            );
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            log.info("✅ BREVO RESPONSE: {}", response.getBody());
 
         } catch (Exception e) {
-            log.error("❌ EMAIL FAILED", e);
+            log.error("❌ SEND EMAIL FAILED", e);
         }
     }
 }
