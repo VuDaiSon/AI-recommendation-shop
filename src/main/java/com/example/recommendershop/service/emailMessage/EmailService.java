@@ -30,7 +30,7 @@ public class EmailService {
             Map<String, Object> body = new HashMap<>();
             body.put("sender", Map.of(
                     "name", "Recommender Shop",
-                    "email", "a9e948001@smtp-brevo.com"
+                    "email", "tatbara2@gmail.com"
             ));
 
             body.put("to", List.of(
