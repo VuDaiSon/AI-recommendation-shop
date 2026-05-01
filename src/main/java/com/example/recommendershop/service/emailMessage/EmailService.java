@@ -18,14 +18,17 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
 
+            message.setFrom("tatbara2@gmail.com");
             message.setTo(to);
             message.setSubject("Reset mật khẩu");
             message.setText("Click link để reset mật khẩu:\n" + link);
 
             mailSender.send(message);
 
+            log.info("✅ Sent to {}", to);
+
         } catch (Exception e) {
-            log.error("❌ Gửi email thất bại tới: {}", to, e);
+            log.error("❌ Send fail", e);
         }
     }
 }
